@@ -49,7 +49,7 @@ public:
    //return the leftChildPtr of  of this treeNode object
    std::shared_ptr<treeNode>  getLeftChildPtr() const;
 
-   //return the rightChildPtr of  of this treeNode object
+   //return the rightChildPtr of  of this treeNode objectleft
    std::shared_ptr<treeNode>  getRightChildPtr() const;
    
 

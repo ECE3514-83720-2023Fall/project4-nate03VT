@@ -61,7 +61,7 @@ public:
    
    //destructor function. Deallocate all memory allocated to the prefix Tree
    virtual ~prefixTree();
-   
+  
    //------------------------------------------------------------
    // Public prefixTree Interface Methods Section.
    //------------------------------------------------------------

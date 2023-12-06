@@ -1,3 +1,10 @@
+////////////////////////////////////////////////////////
+// ECE 3514, Project 4, Nathaniel Sawitzki
+// File name: hw4_main.cpp 
+// Description: runs the tree traversal
+// Date: 12/4/2023 
+
+
 #include"treeNode.h"
 #include"prefixTree.h"
 #include "hw4_datarecord.h"

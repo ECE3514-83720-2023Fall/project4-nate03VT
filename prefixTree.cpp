@@ -1,4 +1,8 @@
-
+////////////////////////////////////////////////////////
+// ECE 3514, Project 4, Nathaniel Sawitzki
+// File name: prefixTree.cpp 
+// Description: prefix tree functions
+// Date: 12/4/2023 
 
 #include "prefixTree.h"
 //#include "treeNode.h"
@@ -13,18 +17,31 @@
 
 prefixTree::prefixTree() 
 {
+	rootPtr = nullptr; //empty tree
 }  // end default constructor
 
-prefixTree::prefixTree(std::string filename) {
+prefixTree::prefixTree(std::string filename) { //*****not finished
+	rootPtr = nullptr;
+	//open file for reading, and check that it has been opened
+	std::ifstream file(filename);
+	if (!file.is_open()) {
+		std::cout << "Error, unable to open file: " << filename << std::endl;
+	}
+	else {
 
+		//read file
 
+	}
+
+	file.close();
 }
 
 
 
 prefixTree::~prefixTree()
 {
-	
+	//resets tree and deallocates all the trees memory
+	clear();
 }
 
 
@@ -33,14 +50,55 @@ prefixTree::~prefixTree()
 
 
 bool prefixTree::add(const std::string netid, const int port) {
-	
-	return false;
+	std::shared_ptr<treeNode> current = rootPtr;
+	std::shared_ptr<treeNode> newNode = nullptr; //will be the new node
+	newNode->setNetId(netid);
+	newNode->setPort(port);
+
+	//tree empty (left or right tree empty)
+	if (rootPtr->getLeftChildPtr() ==nullptr ) {
+		//check if id starts with 0, if so, set left child = new node
+		if (netid.substr(0, 1) == "0") {
+			current->setLeftChildPtr(newNode);
+		}
+
+	}
+	else if (rootPtr->getRightChildPtr() == nullptr) {
+		//check if id starts with 1, if so, set right child = new node
+		if (netid.substr(0, 1) == "1") {
+			current->setRightChildPtr(newNode);
+		}
+	}
+
+	//traverse tree to find most identical prefix
+	while (current != nullptr) {
+
+		//checks the digit
+		if (rootPtr->getLeftChildPtr()) {
+
+		}
+
+
+	}
+
+
+	return true;
 }
 
 int prefixTree::findPort(std::string ipaddr) const
-{
+{	//begin at root pointer (top of tree)
+	std::shared_ptr<treeNode> curr = rootPtr;
 
-	return -1;
+	//once the pointer hits a leaf, it has gone as far as possible 
+	//(found the closest prefix). Or, the tree is empty. 
+	while (curr != nullptr) {
+		
+	
+
+
+
+	}
+	return 0;
 	
 }
 
