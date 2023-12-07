@@ -82,6 +82,10 @@ public:
    // update the port field of routing entry and return true;
    bool add(const std::string netid, const  int port); 
    
+   //add helper, handles the recursive aspect
+   bool addHelper(std::shared_ptr<treeNode>& node, const std::string& netId, const int port);
+
+
   // Given an IP address ipaddr, search the prefixTree to find the valid routing 
    //entry whose network id is the longest matching prefix of the ipaddr.  
    //Return the corresponding port value in the routing entry.
@@ -112,6 +116,7 @@ public:
   //function visit process the node. The function visit is a user defined function that is
   //passed as a parameter to this function.
   std::string postorderTraverse(std::string visit(std::shared_ptr<treeNode> NodePtr)) const;
+
 
 }; 
 

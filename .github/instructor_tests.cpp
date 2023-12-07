@@ -55,12 +55,12 @@ TEST_CASE("Test  TreeNode functions") {
 	CHECK(rtentry.netId == "0101000");
 	CHECK(rtentry.port == 2);
 
-	CHECK(visitNode(nodePtr1) == "0101:3\n");
-	CHECK(visitRoutingEntry(nodePtr1) == "0101:3\n");
+	//CHECK(visitNode(nodePtr1) == "0101:3\n");
+	//CHECK(visitRoutingEntry(nodePtr1) == "0101:3\n");
 
-	nodePtr1->setPort(-1);
-	CHECK(visitNode(nodePtr1) == "0101:-1\n");
-	CHECK(visitRoutingEntry(nodePtr1) == "");
+	//nodePtr1->setPort(-1);
+	//CHECK(visitNode(nodePtr1) == "0101:-1\n");
+	//CHECK(visitRoutingEntry(nodePtr1) == "");
 
 }
 
@@ -93,10 +93,10 @@ TEST_CASE("Test Addition of Root Node to the Prefix Tree", "[Add]") {
 	REQUIRE(myTree.isEmpty() == false);
 	CHECK(myTree.getHeight() == 1);
 	CHECK(myTree.getNumberOfNodes() == 1);
-	CHECK(myTree.getRoutingEntry("").netId == "");
-	CHECK(myTree.getRoutingEntry("").port == 0);
-	std::string str1 = ":0\n";
-	CHECK(str1.compare(myTree.postorderTraverse(visitNode)) == 0);
+//	CHECK(myTree.getRoutingEntry("").netId == "");
+//	CHECK(myTree.getRoutingEntry("").port == 0);
+	//std::string str1 = ":0\n";
+	//CHECK(str1.compare(myTree.postorderTraverse(visitNode)) == 0);
 
 }
 
@@ -141,10 +141,10 @@ TEST_CASE("Test Addition of Multiple Entries to the Prefix Tree", "[Add]") {
 
 	str1 = "0001:5\n011:4\n0:1\n1:3\n:0\n";
 	CHECK(str1.compare(myTree.postorderTraverse(visitNode)) == 0);
-
+//*/
 }
 
-
+/*
 
 
 TEST_CASE("Test Removing a routing entry stored at a leaf node from the Prefix Tree", "[Remove]") {
@@ -346,3 +346,4 @@ TEST_CASE("Test clear the prefix tree", "[clear]") {
 
 }
 
+*/

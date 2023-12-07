@@ -14,6 +14,7 @@
 #include <iomanip>
 #include <string>
 #include <algorithm>
+using namespace std;
 
 prefixTree::prefixTree() 
 {
@@ -50,12 +51,28 @@ prefixTree::~prefixTree()
 
 
 bool prefixTree::add(const std::string netid, const int port) {
+	
+	//if empty create a new tree
+
+	if (rootPtr == nullptr) {
+		rootPtr = make_shared<treeNode>("", -1);
+	}
+
+	if (netid == "") {
+		rootPtr->setPort(port);
+		return true;
+	}
+
+
 	std::shared_ptr<treeNode> current = rootPtr;
-	std::shared_ptr<treeNode> newNode = nullptr; //will be the new node
+	std::shared_ptr<treeNode> newNode; //will be the new node
 	newNode->setNetId(netid);
 	newNode->setPort(port);
+	
 
-	//tree empty (left or right tree empty)
+	
+	//BASECASE
+	//tree with no subtree (left or right tree empty)
 	if (rootPtr->getLeftChildPtr() ==nullptr ) {
 		//check if id starts with 0, if so, set left child = new node
 		if (netid.substr(0, 1) == "0") {
@@ -71,17 +88,45 @@ bool prefixTree::add(const std::string netid, const int port) {
 	}
 
 	//traverse tree to find most identical prefix
-	while (current != nullptr) {
+	//if no prefix is found and at leaf node, add
+	//if no prefix found and stuck, record position to make new tree.
+	while (current->getNetId() != netid) {//*** bad logic
+		std::shared_ptr<treeNode> parent = current; //will hold the parent node to the current node
+		string leftchildstr = current->getLeftChildPtr()->getNetId(); //grabs theleft child netID
+		string rightchildstr = current->getRightChildPtr()->getNetId(); //grabs theleft child netID
 
-		//checks the digit
-		if (rootPtr->getLeftChildPtr()) {
+		//checks if the string is equal
+		
+		if (netid.substr(0,leftchildstr.length()) == leftchildstr) {
+			
+			//check if netids are equal, if so, replace the port
+			if (current->getNetId() == netid) {
+				current->setPort(port);
+				return true;
+			}
 
+
+
+			current = current->getLeftChildPtr();
+			if( (current->getLeftChildPtr()->isLeaf()) && true  ){}//checks if therer is a leaf and ofm
 		}
+		else if (netid.substr(0, rightchildstr.length()) == rightchildstr) {//check right
+			current = current->getRightChildPtr();
+		}
+
+		//check if at leaf
 
 
 	}
+	//if at leaf then insert
 
+	
+	return true;
+	//*/
+}
 
+bool prefixTree::addHelper(std::shared_ptr<treeNode>& node, const std::string& netId, const int port) {
+	//use to use recursive method but had trouble getting it to work
 	return true;
 }
 
@@ -137,32 +182,54 @@ std::string prefixTree::postorderTraverse(std::string visit(std::shared_ptr<tree
 
 
 
-int prefixTree::getHeightHelper(std::shared_ptr<treeNode> subTreePtr) const
-{
-	return -1;
-}
-
 int prefixTree::getNumberOfNodesHelper(std::shared_ptr<treeNode> subTreePtr) const
 {
-	return -1;
+	if (subTreePtr == nullptr) {
+		// Base case: an empty subtree has zero nodes
+		return 0;
+	}
+	else {
+		// Recursive case: number of nodes is 1 plus the sum of nodes in the left and right subtrees
+		return 1 + getNumberOfNodesHelper(subTreePtr->getLeftChildPtr()) +
+			getNumberOfNodesHelper(subTreePtr->getRightChildPtr());
+	}
 }
+
+int prefixTree::getNumberOfNodes() const
+{
+	return getNumberOfNodesHelper(rootPtr);
+}
+
+int prefixTree::getHeightHelper(std::shared_ptr<treeNode> subTreePtr) const
+{
+	if (subTreePtr == nullptr) {
+		// Base case: height of an empty tree is 0
+		return 0;
+	}
+	else {
+		// Recursive case: height is 1 plus the maximum height of the left and right subtrees
+		int leftHeight = getHeightHelper(subTreePtr->getLeftChildPtr());
+		int rightHeight = getHeightHelper(subTreePtr->getRightChildPtr());
+		return std::max(leftHeight, rightHeight) + 1;
+	}
+}
+
+
+int prefixTree::getHeight() const
+{
+	int height = getHeightHelper(rootPtr);
+	return height;
+}
+
 
 
 
 
 
 bool prefixTree::isEmpty() const {
-	return true;
+	return (rootPtr==nullptr );
 }
 
-int prefixTree::getHeight() const
-{
-	return 0;
-}
 
-int prefixTree::getNumberOfNodes() const
-{
-	return 0;
-}
 
 
