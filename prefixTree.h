@@ -85,6 +85,9 @@ public:
    //add helper, handles the recursive aspect
    bool addHelper(std::shared_ptr<treeNode>& node, const std::string& netId, const int port);
 
+   //when you must break branch of a tree off to insert a new node
+   //must insert invalid node which is 
+   bool insertNode( std::shared_ptr<treeNode>& node, const std::string& netId, const int port);
 
   // Given an IP address ipaddr, search the prefixTree to find the valid routing 
    //entry whose network id is the longest matching prefix of the ipaddr.  
