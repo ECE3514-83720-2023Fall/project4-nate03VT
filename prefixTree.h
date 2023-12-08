@@ -97,6 +97,7 @@ public:
    //for longest prefix matching
    int findPort(std::string ipaddr) const;
 
+   int findPortHelper(std::shared_ptr<treeNode> node, std::string ipaddr) const;
 
    // Removes the targeted routing entry from the prefixTree.  
    //The routing entry's network id netid is given.
@@ -104,9 +105,12 @@ public:
 
   bool remove(const std::string netId); 
 
+bool removeHelper(std::shared_ptr<treeNode> node, const std::string netId);
+
   //deallocate the memory allocated to the prefixTree. Reset the tree to an empty tree;
   void clear();
    
+  void clearTreeHelper(std::shared_ptr<treeNode> subTreePtr) const;
   
   // Search the prefixTree to find a valid routing entry with the target network id (netId) 
   //If the routing entry is found, return the routing entry value 
@@ -119,7 +123,8 @@ public:
   //function visit process the node. The function visit is a user defined function that is
   //passed as a parameter to this function.
   std::string postorderTraverse(std::string visit(std::shared_ptr<treeNode> NodePtr)) const;
-
+  
+  //std::string prefixTree::postorderTraverseHelper(std::string visit(std::shared_ptr<treeNode> NodePtr), std::shared_ptr<treeNode> treePtr) const;
 
 }; 
 

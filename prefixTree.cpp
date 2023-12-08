@@ -24,17 +24,27 @@ prefixTree::prefixTree()
 prefixTree::prefixTree(std::string filename) { //*****not finished
 	rootPtr = nullptr;
 	//open file for reading, and check that it has been opened
-	std::ifstream file(filename);
-	if (!file.is_open()) {
+	std::ifstream inputFile(filename);
+	if (!inputFile.is_open()) {
 		std::cout << "Error, unable to open file: " << filename << std::endl;
 	}
 	else {
 
-		//read file
+		std::string line;
+		while (std::getline(inputFile, line)) {
+			size_t delimiterPos = line.find(':');
+			if (delimiterPos != std::string::npos) {
+				std::string netId = line.substr(0, delimiterPos);
+				int port = std::stoi(line.substr(delimiterPos + 1));
+
+				// Add the routing entry to the prefix tree
+				add(netId, port);
+			}
+		}
 
 	}
 
-	file.close();
+	inputFile.close();
 }
 
 
@@ -55,7 +65,9 @@ bool prefixTree::add(const std::string netid, const int port) {
 	//if empty create a new tree from root node
 
 	if (rootPtr == nullptr) {
-		rootPtr = make_shared<treeNode>("", -1);
+		rootPtr = make_shared<treeNode>(netid, port);
+		return true;
+
 	}
 
 	if (netid == "") {
@@ -63,12 +75,9 @@ bool prefixTree::add(const std::string netid, const int port) {
 		return true;
 	}
 	
-	//new node to be inserted
-	std::shared_ptr<treeNode> newNode; //will be the new node
-	newNode->setNetId(netid);
-	newNode->setPort(port);
 
-	return true;
+
+	return addHelper(rootPtr, netid, port);
 
 
 }
@@ -80,48 +89,130 @@ bool prefixTree::addHelper(std::shared_ptr<treeNode>& node, const std::string& n
 		node->setPort(port);
 		return true;
 	}
-
+	
+	/*
 //SECTION 2: handles stuck cases
 	int leftChildlength = node->getLeftChildPtr()->getNetId().length();
 	int rightChildlength = node->getRightChildPtr()->getNetId().length();
-		bool leftChildValid = netId.substr(0, leftChildlength) == node->getLeftChildPtr()->getNetId(); 
-		bool rightChildValid = netId.substr(0, rightChildlength) == node->getRightChildPtr()->getNetId();
+	bool leftChildValid;
+	bool rightChildValid;
+	
+
+		if (node->getLeftChildPtr() == nullptr) leftChildValid = false;
+		else leftChildValid = netId.substr(0, leftChildlength) == node->getLeftChildPtr()->getNetId();
+		 
+	if (node->getRightChildPtr() == nullptr) rightChildValid = false;
+	else rightChildValid = netId.substr(0, rightChildlength) == node->getRightChildPtr()->getNetId();
+
 //if neither left nor right child has a matching prefix to traverse into, we are stuck and need to insert a node
 		bool stuck = (!leftChildValid && !rightChildValid) || ( (leftChildlength>netId.length()) && (rightChildlength > netId.length()));
 
 		//this section checks if neither child prefix can be moved into
 		if ( !leftChildValid && !rightChildValid) { //if child prefix is longer than netid
-			return	insertNode(node, netId, port);
+			return	insertNode( node, netId, port);
 		}
+		*/
 
 //SECTION 3: Handles insertion into leafs
-
-
-	if (netId < node->getNetId()) { //case where we should move left
-
+	int	nodeLength = node->getNetId().length();
+		//checks if the netId is less than the current nodes 
+	if (netId.substr(nodeLength, 1) == "0") { //case where we should move left
+		if (node->getLeftChildPtr() == nullptr) {
+			// Create a new node if the left child is null
+			node->setLeftChildPtr(make_shared<treeNode>(netId, port));
+					return true; // Added successfully
+		}
+		else {
+			// Recursively traverse to the left subtree
+			return addHelper(node->getLeftChildPtr(), netId, port);
+		}
 	}
+	else { //case for inserting into right
+		if (node->getRightChildPtr() == nullptr) {
+			// Create a new node if the right child is null
+			node->setRightChildPtr(make_shared<treeNode>(netId, port));
+			return true; // Added successfully
+		}
+		else {
+			// Recursively traverse to the left subtree
+			return addHelper(node->getRightChildPtr(), netId, port);
+		}
+	}
+
+
 }
 
-bool prefixTree::insertNode(std::shared_ptr<treeNode>& node, const std::string& netId, const int port) {
+bool prefixTree::insertNode( std::shared_ptr<treeNode>& node, const std::string& netId, const int port) {
+	//create the netid for the invalid node (has the opossite last bit of inserting node)
+	string invalidId = netId;
+	if (invalidId.back() == '1') invalidId.back() = '0';
+	else invalidId.back() = '1';
+	
+	
+	//create invalid node with proper netid
+	shared_ptr<treeNode> invalidNode = make_shared<treeNode>(invalidId, -1) ;
 
+	// invalid's children become the nodes children
+	invalidNode->setLeftChildPtr(node->getLeftChildPtr());
+	invalidNode->setRightChildPtr(node->getRightChildPtr());
+
+	//make invalid node and the new node children of the node we are in
+	if (invalidId.back() == '0') {
+		node->setLeftChildPtr(invalidNode);
+		node->setRightChildPtr(make_shared<treeNode>(netId, port));
+	}
+	else {
+		node->setRightChildPtr(invalidNode);
+		node->setLeftChildPtr(make_shared<treeNode>(netId, port));
+	}
 	return true;
 }
 
+int prefixTree::findPortHelper(shared_ptr<treeNode> node, std::string ipaddr) const {
+	string rt = "5";
+	string lt = "5";
+
+	if(node->getRightChildPtr() != nullptr)  rt = node->getRightChildPtr()->getNetId();
+	if (node->getLeftChildPtr() != nullptr)	lt = node->getRightChildPtr()->getNetId();
+
+	//if you start and neither match then return -1
+	if (node == rootPtr) {
+		if ((rt != ipaddr.substr(0, rt.length())) && (lt != ipaddr.substr(0, lt.length()))) {
+			return -1;
+		}
+	}
+	
+
+
+	// checks if either subtree can be moved into
+	//if not then you have found the longest prefix match, so return the port
+	if(node->getLeftChildPtr() != nullptr) {
+		if ((lt == ipaddr.substr(0, lt.length())) && (node->getLeftChildPtr() != nullptr)) {
+			return findPortHelper(node->getLeftChildPtr(), ipaddr);
+		}
+	}
+	else if(node->getRightChildPtr() != nullptr) {
+		if ((rt == ipaddr.substr(0, rt.length())) && (node->getRightChildPtr() != nullptr)) {
+			return findPortHelper(node->getRightChildPtr(), ipaddr);
+		}
+	}
+	else return node->getPort();
+
+
+
+}
 
 int prefixTree::findPort(std::string ipaddr) const
-{	//begin at root pointer (top of tree)
+{
+	if (rootPtr == nullptr) return -1;
+	//begin at root pointer (top of tree)
 	std::shared_ptr<treeNode> curr = rootPtr;
 
 	//once the pointer hits a leaf, it has gone as far as possible 
 	//(found the closest prefix). Or, the tree is empty. 
-	while (curr != nullptr) {
-		
+
 	
-
-
-
-	}
-	return 0;
+	return findPortHelper(curr, ipaddr);
 	
 }
 
@@ -130,20 +221,83 @@ int prefixTree::findPort(std::string ipaddr) const
 bool prefixTree::remove(const std::string prefix)
 {
 	
-	return false;
+	if (rootPtr == nullptr) return false;
+	//begin at root pointer (top of tree)
+	std::shared_ptr<treeNode> curr = rootPtr;
+
+	
+	return removeHelper(curr, prefix);
 }
+
+bool prefixTree::removeHelper(std::shared_ptr<treeNode> node, const std::string ipaddr) {
+
+	string rt = "5";
+	string lt = "5";
+	return true;
+	if (node->getRightChildPtr() != nullptr)  rt = node->getRightChildPtr()->getNetId();
+	if (node->getLeftChildPtr() != nullptr)	lt = node->getRightChildPtr()->getNetId();
+
+	//if you start and neither match then return -1
+	if (node == rootPtr) {
+		if ((rt != ipaddr.substr(0, rt.length())) && (lt != ipaddr.substr(0, lt.length()))) {
+			return false;
+		}
+	}
+
+
+
+	// checks if either subtree can be moved into
+	//if not then you have found the longest prefix match, so return the port
+	if (node->getLeftChildPtr() != nullptr) {
+		if ((lt == ipaddr.substr(0, lt.length())) && (node->getLeftChildPtr() != nullptr)) {
+			return removeHelper(node->getLeftChildPtr(), ipaddr);
+		}
+	}
+	else if (node->getRightChildPtr() != nullptr) {
+		if ((rt == ipaddr.substr(0, rt.length())) && (node->getRightChildPtr() != nullptr)) {
+			return removeHelper(node->getRightChildPtr(), ipaddr);
+		}
+	}
+	else return true;
+}
+
+void prefixTree::clearTreeHelper(std::shared_ptr<treeNode> subTreePtr) const {
+	//if there are stuff left in the tree
+	if (subTreePtr != nullptr) {
+		//clear
+		clearTreeHelper(subTreePtr->getLeftChildPtr());
+		clearTreeHelper(subTreePtr->getRightChildPtr());
+		//reset for next call
+		subTreePtr.reset();
+	}
+}
+
 
 void prefixTree::clear()
 {
-	
-	return;
+	clearTreeHelper(rootPtr);
+	rootPtr = nullptr;
 }
+
 
 
 std::string prefixTree::postorderTraverseHelper(std::string visit(std::shared_ptr<treeNode> NodePtr), std::shared_ptr<treeNode> treePtr) const
 {
-	
-	return "";
+	if (treePtr == nullptr) {
+		// Base case: an empty subtree, return an empty string
+		return "";
+	}
+	else {
+		// Recursive case: concatenate the results of postorder traversal on left and right subtrees
+		std::string result = "";
+		result += postorderTraverseHelper(visit, treePtr->getLeftChildPtr());
+		result += postorderTraverseHelper(visit, treePtr->getRightChildPtr());
+
+		// Append the result of processing the current node using the visit function
+		result += visit(treePtr);
+
+		return result;
+	}
 }
 
 
@@ -154,8 +308,14 @@ RoutingEntry  prefixTree::getRoutingEntry(const std::string netId) const
 	return RoutingEntry{ "", -1 };
 }
 
+
+
+
+
+
 std::string prefixTree::postorderTraverse(std::string visit(std::shared_ptr<treeNode> NodePtr)) const {
-	return "";
+
+	return postorderTraverseHelper(visit, rootPtr);
 }
 
 
