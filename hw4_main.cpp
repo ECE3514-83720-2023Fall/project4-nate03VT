@@ -12,7 +12,7 @@
 #include<memory>
 
 
-void main() {
+int main() {
 /*	prefixTree myTree("routing_table.txt");
 	
 	std::cout << "-------------Tree ----------------------\n\n";
@@ -36,6 +36,6 @@ void main() {
 	myTree.add("1", 3);
 	std::string result = myTree.postorderTraverse(visitNode);
 	std::cout << result << std::endl;
-	
+	return 0;
 }
 

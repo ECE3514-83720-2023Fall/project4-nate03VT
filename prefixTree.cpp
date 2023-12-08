@@ -82,7 +82,7 @@ bool prefixTree::add(const std::string netid, const int port) {
 
 }
 
-bool prefixTree::addHelper(std::shared_ptr<treeNode>& node, const std::string& netId, const int port) {
+bool prefixTree::addHelper(std::shared_ptr<treeNode> node, const std::string& netId, const int port) {
 	
 //SECTION 1: handles matching prefix case
 	if (node->getNetId() == netId) { //if ip prefix already exists, update port number
@@ -142,7 +142,7 @@ bool prefixTree::addHelper(std::shared_ptr<treeNode>& node, const std::string& n
 
 }
 
-bool prefixTree::insertNode( std::shared_ptr<treeNode>& node, const std::string& netId, const int port) {
+bool prefixTree::insertNode( std::shared_ptr<treeNode> node, const std::string& netId, const int port) {
 	//create the netid for the invalid node (has the opossite last bit of inserting node)
 	string invalidId = netId;
 	if (invalidId.back() == '1') invalidId.back() = '0';
