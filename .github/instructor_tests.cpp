@@ -55,12 +55,12 @@ TEST_CASE("Test  TreeNode functions") {
 	CHECK(rtentry.netId == "0101000");
 	CHECK(rtentry.port == 2);
 
-	//CHECK(visitNode(nodePtr1) == "0101:3\n");
-	//CHECK(visitRoutingEntry(nodePtr1) == "0101:3\n");
+	CHECK(visitNode(nodePtr1) == "0101:3\n");
+	CHECK(visitRoutingEntry(nodePtr1) == "0101:3\n");
 
-	//nodePtr1->setPort(-1);
-	//CHECK(visitNode(nodePtr1) == "0101:-1\n");
-	//CHECK(visitRoutingEntry(nodePtr1) == "");
+	nodePtr1->setPort(-1);
+	CHECK(visitNode(nodePtr1) == "0101:-1\n");
+	CHECK(visitRoutingEntry(nodePtr1) == "");
 
 }
 
@@ -93,10 +93,10 @@ TEST_CASE("Test Addition of Root Node to the Prefix Tree", "[Add]") {
 	REQUIRE(myTree.isEmpty() == false);
 	CHECK(myTree.getHeight() == 1);
 	CHECK(myTree.getNumberOfNodes() == 1);
-//	CHECK(myTree.getRoutingEntry("").netId == "");
-//	CHECK(myTree.getRoutingEntry("").port == 0);
-	//std::string str1 = ":0\n";
-	//CHECK(str1.compare(myTree.postorderTraverse(visitNode)) == 0);
+	CHECK(myTree.getRoutingEntry("").netId == "");
+	CHECK(myTree.getRoutingEntry("").port == 0);
+	std::string str1 = ":0\n";
+	CHECK(str1.compare(myTree.postorderTraverse(visitNode)) == 0);
 
 }
 
@@ -141,10 +141,10 @@ TEST_CASE("Test Addition of Multiple Entries to the Prefix Tree", "[Add]") {
 
 	str1 = "0001:5\n011:4\n0:1\n1:3\n:0\n";
 	CHECK(str1.compare(myTree.postorderTraverse(visitNode)) == 0);
-//*/
+
 }
 
-/*
+
 
 
 TEST_CASE("Test Removing a routing entry stored at a leaf node from the Prefix Tree", "[Remove]") {
@@ -251,7 +251,7 @@ TEST_CASE("Test Creating a PrefixTree from an input file", "[constructor]") {
 	CHECK(myTree.getNumberOfNodes() == 12);
 
 	std::string str1 = "0100001:1\n0101:2\n010:-1\n01:2\n0:12\n1011110:15\n1011111:16\n101111:-1\n101:1\n11:3\n1:-1\n:0\n";
-	//std::cout << myTree.postorderTraverse(visitNode);
+	std::cout << myTree.postorderTraverse(visitNode);
 	CHECK(str1.compare(myTree.postorderTraverse(visitNode)) == 0);
 
 	std::string str2 = "0100001:1\n0101:2\n01:2\n0:12\n1011110:15\n1011111:16\n101:1\n11:3\n:0\n";
@@ -346,4 +346,3 @@ TEST_CASE("Test clear the prefix tree", "[clear]") {
 
 }
 
-*/
